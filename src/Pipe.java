@@ -5,7 +5,7 @@ import javax.swing.*;
 public class Pipe
 {
 
-    private Pipe(String version)
+    public Pipe(String version)
     {
         PipeApplicationModel applicationModel = new PipeApplicationModel(version);
         PipeApplicationController applicationController = new PipeApplicationController(applicationModel);

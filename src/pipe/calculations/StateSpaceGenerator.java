@@ -131,7 +131,19 @@ public class StateSpaceGenerator {
 
 		currentState = new MarkingState(currentMarking, numStates, isTangible(
 				pnmlData, currentMarking));
-		currentState.setPlaceMarking(currentMarking.getPlaceMarking());
+		
+		/*
+		 *  J added this cause getPlaceMarking() gets marking from getApplicationView() which will be null in Petrinator
+		 */
+		try
+		{
+			currentState.setPlaceMarking(currentMarking.getPlaceMarking());
+		}
+		catch(NullPointerException e)
+		{
+			currentState.setPlaceMarking(pnmlData.getCurrentMarkingVector());
+		}
+		
 		numStates++;
 		statesQueue.enqueue(currentState);
 		addExplored(currentState, exploredStates, esoFile, true);
@@ -771,7 +783,7 @@ public class StateSpaceGenerator {
 			}
 			newmarking[count] = marking[count] - CMinusValue + CPlusValue;
 		}
-			
+
 		setTokenAfterFiringTransition(transIndex);
 		return newmarking;
 	}
@@ -1062,10 +1074,10 @@ public class StateSpaceGenerator {
 		int[] marking2 = sprime.getState();
 		int markSize = marking1.length;
 //		int[][] incidenceMatrix =getPreviousIncidentMatrix();
-		
-		
+
+
 		/**
-		 * 
+		 *
 		 */
 		pnmlData.setCurrentMarkingVector(s.getState());
 		int[][] incidenceMatrix = pnmlData

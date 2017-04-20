@@ -2,7 +2,6 @@ package pipe.gui.widgets;
 
 import pipe.utilities.math.Matrix;
 import pipe.views.PetriNetViewComponent;
-
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EtchedBorder;
@@ -52,14 +51,13 @@ public class ResultsHTMLPane
            "body{font-family:Arial,Helvetica,sans-serif;text-align:center;"+
            "background:#ffffff}" +
            "td.colhead{font-weight:bold;text-align:center;" +
-           "background:#ffffff}" +
-           "td.rowhead{font-weight:bold;background:#ffffff}"+
-           "td.cell{text-align:center;padding:5px,0}" +
-           "tr.even{background:#a0a0d0}" +
-           "tr.odd{background:#c0c0f0}" +
-           "td.empty{background:#ffffff}" +
+           "background:#A9D0F5}" +
+           "td.rowhead{font-weight:bold;background:#A9D0F5}"+
+           "td.cell{text-align:center;padding:5px,0; background:#ffffff}" +
+           "tr.even{background:#ffffff}" +
+           "tr.odd{background:#ffffff}" +
+           "td.empty{background:#A9D0F5}" +
            "</style>";
-   
    
    public ResultsHTMLPane(String path) {
       super(new BorderLayout());
@@ -210,7 +208,10 @@ public class ResultsHTMLPane
    public static String makeTable(Object[] items, int cols, boolean showLines,
            boolean doShading, boolean columnHeaders, boolean rowHeaders) {
       StringBuilder s = new StringBuilder();
-       s.append("<table border=").append(showLines ? 1 : 0).append(" cellspacing=2>");
+      //s.append(items[0]);
+      //items[0] = "";
+       s.append("<br>");
+       s.append("<table border=").append(showLines ? 1 : 0).append(" cellspacing = 2>");
       int j = 0;
       for (int i=0; i < items.length; i++) {
          if (j==0) {
@@ -218,8 +219,10 @@ public class ResultsHTMLPane
                                             : ">");
          }
          s.append("<td class=");
-         if (i==0 && items[i]=="") {
-            s.append("empty>");
+         if (i==0 && ((String) items[i]).length() != 0) {
+            s.append("cell>");
+         } else if(i == 0) {
+        	 s.append("empty>");
          } else if ((j == 0) && rowHeaders) {
             s.append("rowhead>");
          } else if ((i < cols) && columnHeaders) {
@@ -228,6 +231,8 @@ public class ResultsHTMLPane
             s.append("cell>");
          }
           s.append(items[i]).append("</td>");
+         
+          
          if ( ++j == cols) {
             s.append("</tr>");
             j=0;
@@ -237,6 +242,51 @@ public class ResultsHTMLPane
       return s.toString();
    }
    
+   /*
+    * @brief Esta la hice yo para que quede más lindo pero no me salió
+    */
+   /*
+   public static String makeTable(Object[] items, int cols, boolean showLines,
+           boolean doShading, boolean columnHeaders, boolean rowHeaders) {
+      StringBuilder s = new StringBuilder();
+      String matrixName = (String) items[0];
+      
+      s.append(items[0] + "<br>");
+      s.append("<table border=").append(showLines ? 1 : 0).append(" cellspacing=2>");
+      int j = 0;
+      for (int i=0; i < items.length; i++) 
+      {
+         s.append("<td class=");
+         if(items[i].equals(matrixName))
+         {
+        	 s.append("cell>");
+         }
+         else if (i==0 && items[i]=="") {
+            s.append("empty>");
+         } else if ((j == 0) && rowHeaders) {
+            s.append("rowhead>");
+         } else if ((i < cols) && columnHeaders) {
+            s.append("colhead>");
+         } else {
+            s.append("cell>");
+         }
+         if(!(i == 0 && j == 0)) // Don't add matrix title as row
+         {
+        	 s.append(items[i]).append("</td>");
+        	 System.out.println(i + " "+ j  + items[i]+ "\n");
+         }
+        	 
+         if (++j == cols) 
+         {
+            s.append("</tr>");
+            j = 0;
+         }
+      }
+      s.append("</table>");
+      s.append("<br>");
+      return s.toString();
+   }
+   */
    
    public static String makeTable(Matrix matrix, PetriNetViewComponent[] name,
            boolean showLines, boolean doShading, boolean columnHeaders,

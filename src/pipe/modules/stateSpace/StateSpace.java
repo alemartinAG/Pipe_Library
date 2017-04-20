@@ -120,7 +120,8 @@ public class StateSpace
                     }
 
                     s += ResultsHTMLPane.makeTable(
-                            new String[]{"Bounded", "" + bounded,
+                            new String[]{"Property","",
+                                    "Bounded", "" + bounded,
                                     "Safe", "" + safe,
                                     "Deadlock", "" + deadlock},
                             2, false, true, false, true);
@@ -181,49 +182,4 @@ public class StateSpace
             results.setText(s);
         }
     };
-
-
-    //<Marc>
-    public boolean[] getStateSpace(PetriNetView sourceDataLayer) throws EmptyNetException, TreeTooBigException
-    {
-        boolean[] result = new boolean[3];
-
-        //Get the new marking from the _dataLayer object
-        LinkedList<MarkingView>[] markings = sourceDataLayer.getCurrentMarkingVector();
-        int[] markup = new int[markings.length];
-        for(int k = 0; k < markings.length; k++)
-        {
-            markup[k] = markings[k].getFirst().getCurrentMarking();
-        }
-
-
-        myTree tree = null;
-
-        if(!sourceDataLayer.hasPlaceTransitionObjects())
-        {
-            throw new EmptyNetException();
-        }
-        else if(markup != null)
-        {
-            tree = new myTree(sourceDataLayer, markup);
-            result[0] = !tree.foundAnOmega;
-            result[1] = !tree.moreThanOneToken;
-            result[2] = tree.noEnabledTransitions;
-            if(tree.tooBig)
-            {
-
-            }
-        }
-
-        return result;
-    }
-    //</Marc>
-
-
-    public boolean[] getStateSpace()
-    {
-
-        return new boolean[3];
-    }
-
 }

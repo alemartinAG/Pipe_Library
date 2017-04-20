@@ -4,7 +4,7 @@
 
 package pipe.gui.widgets;
 
-import java.awt.Frame;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;

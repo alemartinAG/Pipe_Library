@@ -11,7 +11,6 @@ import pipe.gui.widgets.EscapableDialog;
 import pipe.gui.widgets.PetriNetChooserPanel;
 import pipe.gui.widgets.ResultsHTMLPane;
 import pipe.modules.interfaces.IModule;
-import pipe.utilities.Expander;
 import pipe.utilities.writers.PNMLWriter;
 import pipe.views.MarkingView;
 import pipe.views.PetriNetView;
@@ -26,8 +25,7 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-public class Matrices
-        implements IModule
+public class Matrices implements IModule
 {
 
     private static final String MODULE_NAME = "Incidence & Marking";
@@ -39,14 +37,14 @@ public class Matrices
         // Check if this net is a CGSPN. If it is, then this
         // module won't work with it and we must convert it.
         PetriNetView pnmlData = ApplicationSettings.getApplicationView().getCurrentPetriNetView();
-        
-        if(pnmlData.getEnabledTokenClassNumber() > 1){
+
+       /* if(pnmlData.getEnabledTokenClassNumber() > 1){
 			Expander expander = new Expander(pnmlData);
 			pnmlData = expander.unfold();
 			JOptionPane.showMessageDialog(null, "This is CGSPN. The analysis will only apply to default color (black)",
 					"Information", JOptionPane.INFORMATION_MESSAGE);
-		}
-        
+		}*/
+
 //        if(pnmlData.getTokenViews().size() > 1)
 //        {
 //            Expander expander = new Expander(pnmlData);
@@ -54,7 +52,7 @@ public class Matrices
 //        }
         // Build interface
         EscapableDialog guiDialog =
-                new EscapableDialog(ApplicationSettings.getApplicationView(), MODULE_NAME, true);
+                new EscapableDialog(null, MODULE_NAME, true);
 
         // 1 Set layout
         Container contentPane = guiDialog.getContentPane();
@@ -62,7 +60,7 @@ public class Matrices
 
         // 2 Add file browser
         sourceFilePanel = new PetriNetChooserPanel("Source net", pnmlData);
-        contentPane.add(sourceFilePanel);
+       // contentPane.add(sourceFilePanel);
 
         // 3 Add results pane
         results = new ResultsHTMLPane(pnmlData.getPNMLName());
@@ -94,7 +92,9 @@ public class Matrices
 
         public void actionPerformed(ActionEvent arg0)
         {
-            PetriNetView data = sourceFilePanel.getDataLayer();
+            //PetriNetView data = sourceFilePanel.getDataLayer();
+
+            PetriNetView data = new PetriNetView("C:/Users/Envy/Desktop/try.pnml");
             String s = "<h2>Petri net incidence and marking</h2>";
             if(data == null)
             {
@@ -108,7 +108,6 @@ public class Matrices
             {
                 try
                 {
-
                     PNMLWriter.saveTemporaryFile(data, this.getClass().getName());
 
                     s += ResultsHTMLPane.makeTable(new String[]{
@@ -254,10 +253,12 @@ public class Matrices
 
         ArrayList result = new ArrayList();
         data.setEnabledTransitions();
+        result.add("");
         for(TransitionView transitionView1 : transitionViews)
         {
             result.add(transitionView1.getName());
         }
+        result.add("Enabled");
         for(TransitionView transitionView : transitionViews)
         {
             result.add((transitionView.isEnabled() ? "yes" : "no"));
@@ -265,6 +266,6 @@ public class Matrices
         data.resetEnabledTransitions();
 
         return ResultsHTMLPane.makeTable(
-                result.toArray(), transitionViews.length, false, true, true, false);
+                result.toArray(), transitionViews.length + 1, false, false, true, true);
     }
 }

@@ -66,7 +66,8 @@ public class PetriNetView extends Observable implements Cloneable, IObserver, Se
     {
         _tokenViews = null;
         _model = new PetriNet();
-        _petriNetController = ApplicationSettings.getPetriNetController();
+        //_petriNetController = ApplicationSettings.getPetriNetController();
+        _petriNetController = new PetriNetController();
         _model.registerObserver(this);
         initializeMatrices();
         PNMLTransformer transform = new PNMLTransformer();

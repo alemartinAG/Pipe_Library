@@ -40,7 +40,7 @@ public class MinimalSiphons
 {
 
 
-    private PetriNetView _pnmlData;
+    //private PetriNetView _pnmlData;
 
     /* */
     private static final String MODULE_NAME = "Minimal Siphons And Minimal Traps";
@@ -72,7 +72,7 @@ public class MinimalSiphons
             pnmlData = expander.unfold();
         }
         // Keep a reference to the p-n for other methods in this class
-        this._pnmlData = pnmlData;
+        //this._pnmlData = pnmlData;
 
         // Build interface
         EscapableDialog guiDialog =
@@ -168,7 +168,7 @@ public class MinimalSiphons
      * @param pnmlData
      * @return
      */
-    String analyse(PetriNetView pnmlData)
+    public String analyse(PetriNetView pnmlData)
     {
 
         Date start_time = new Date(); // start timer for program execution
@@ -182,7 +182,7 @@ public class MinimalSiphons
                              pnmlData.getActiveTokenView().getBackwardsIncidenceMatrix(pnmlData.getArcsArrayList(), pnmlData.getTransitionsArrayList(),
                                                                                        pnmlData.getPlacesArrayList())),
                 new SetOfPlaces(pnmlData.numberOfPlaces()));
-        output += toString(siphons);
+        output += toString(siphons, pnmlData);
 
         output += "<h3>Minimal traps</h3>";
         // now, compute traps switching forwards and backwards incidence matrices
@@ -194,7 +194,7 @@ public class MinimalSiphons
                                      pnmlData.getArcsArrayList(), pnmlData.getTransitionsArrayList(),
                                      pnmlData.getPlacesArrayList())),
                 new SetOfPlaces(pnmlData.numberOfPlaces()));
-        output += toString(traps);
+        output += toString(traps, pnmlData);
 
         Date stop_time = new Date();
         double etime = (stop_time.getTime() - start_time.getTime()) / 1000.;
@@ -203,7 +203,7 @@ public class MinimalSiphons
     }
 
 
-    private String toString(Vector<boolean[]> vector)
+    private String toString(Vector<boolean[]> vector, PetriNetView pnmlData)
     {
         String s = "";
 
@@ -217,7 +217,7 @@ public class MinimalSiphons
             s += "{";
             for(int i = 0; i < element.length; i++)
             {
-                s += element[i] ? _pnmlData.getPlace(i).getName() + ", "
+                s += element[i] ? pnmlData.getPlace(i).getName() + ", "
                         : "";
             }
             // replace the last occurance of ", "
