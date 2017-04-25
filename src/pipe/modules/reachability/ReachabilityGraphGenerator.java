@@ -321,7 +321,7 @@ implements IModule
 					}
 
 
-	private static DefaultGraph createGraph(File rgFile, PetriNetView dataLayer,
+	public static DefaultGraph createGraph(File rgFile, PetriNetView dataLayer,
 			boolean coverabilityGraph) throws IOException
 			{
 		DefaultGraph graph = new DefaultGraph();

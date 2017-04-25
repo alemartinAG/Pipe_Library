@@ -11,3 +11,4 @@
 !*.xslt
 !*.xcf
 !.gitignore
+/bin/
