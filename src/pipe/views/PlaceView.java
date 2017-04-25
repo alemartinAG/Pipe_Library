@@ -385,6 +385,88 @@ public class PlaceView extends ConnectableView implements Serializable
         return new PlaceMarking(this, oldMarkingView, newMarkingView);
     }
 
+    
+    public HistoryItem setCurrentMarking(LinkedList<MarkingView> currentMarkingViewInput, PetriNetView pnmlData)
+    {
+    	if(_initialMarkingView.size()==0){
+    		_initialMarkingView=Copier.mediumCopy(_currentMarkingView);
+    	}
+    	
+    	
+        int totalMarking = 0;
+        for(MarkingView inputtedMarkingView : currentMarkingViewInput)
+        {
+            totalMarking += inputtedMarkingView.getCurrentMarking();
+        }
+        // If total marking exceeds capacity then leave the marking as is
+        if(capacity != 0 && totalMarking > capacity)
+        {
+            return new PlaceMarking(this, _currentMarkingView, _currentMarkingView);
+        }
+
+        LinkedList<MarkingView> oldMarkingView = Copier.mediumCopy(_currentMarkingView);
+
+        // if a marking for a specific class that existed before does not exist
+        // in
+        // the new input then this place must release the lock for that token
+        // class
+        // to allow it to be edited. Also if a previously positive marking is
+        // now
+        // 0 then the same should happen.
+        for(MarkingView m : _currentMarkingView)
+        {
+            int newMarkingPos = getMarkingListPos(m.getToken().getID(),
+                                                  currentMarkingViewInput);
+            if((newMarkingPos == -1)
+                    || (currentMarkingViewInput.get(newMarkingPos)
+                    .getCurrentMarking() == 0 && m.getCurrentMarking() != 0))
+            {
+                pnmlData.unlockTokenClass(m.getToken().getID());
+            }
+        }
+        // if a marking for a specific class that didnt exist before is in
+        // the new input then this place must acquire the lock for that token
+        // class
+        // to avoid it from being edited. Also if a now positive marking was
+        // previously
+        // 0 then the same should happen.
+        for(MarkingView m : currentMarkingViewInput)
+        {
+            int oldMarkingPos = getMarkingListPos(m.getToken().getID(),
+                                                  _currentMarkingView);
+            if((oldMarkingPos == -1 && m.getCurrentMarking() > 0)
+                    || (_currentMarkingView.get(oldMarkingPos).getCurrentMarking() == 0 && m
+                    .getCurrentMarking() != 0))
+            {
+            	pnmlData.lockTokenClass(m.getToken().getID());
+            }
+            // Now update the current marking if such a marking exists, otherwise create a new one
+            if(oldMarkingPos == -1)
+            {
+                _currentMarkingView.add(m);
+            }
+            else
+            {
+                _currentMarkingView.get(oldMarkingPos).setCurrentMarking(m.getCurrentMarking());
+            }
+        }
+        LinkedList<TokenView> tokenViews = pnmlData.getTokenViews();
+        for(TokenView tc : tokenViews)
+        {
+            if(tc.isEnabled())
+            {
+                if(getMarkingListPos(tc.getID(), _currentMarkingView) == -1)
+                {
+                    MarkingView m = new MarkingView(tc, 0);
+                    _currentMarkingView.add(m);
+                }
+            }
+        }
+        repaint();
+        LinkedList<MarkingView> newMarkingView = Copier.mediumCopy(_currentMarkingView);
+        return new PlaceMarking(this, oldMarkingView, newMarkingView);
+    }
+    
     public HistoryItem setCapacity(int newCapacity)
     {
         int oldCapacity = capacity;

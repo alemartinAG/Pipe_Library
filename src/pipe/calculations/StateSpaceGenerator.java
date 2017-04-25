@@ -223,7 +223,10 @@ public class StateSpaceGenerator {
 				System.err.println("\nCould not delete intermediate file.");
 			}
 		}
-		pnmlData.restorePreviousMarking();
+		try{
+		pnmlData.restorePreviousMarking();}
+		catch(NullPointerException e){
+		pnmlData.restorePreviousMarking(pnmlData);}
 	}
 
 	/**
@@ -784,16 +787,80 @@ public class StateSpaceGenerator {
 			newmarking[count] = marking[count] - CMinusValue + CPlusValue;
 		}
 
-		setTokenAfterFiringTransition(transIndex);
+		try
+		{
+			setTokenAfterFiringTransition(transIndex);
+		}
+		catch(NullPointerException e)
+		{
+			setTokenAfterFiringTransition(transIndex, pnmlData);
+		}
+		
 		return newmarking;
 	}
-	
 	
 
 	public static void setTokenAfterFiringTransition(int transitionId) {
 
 		PetriNetView dataLayer = ApplicationSettings.getApplicationView()
 				.getCurrentPetriNetView();
+		ArrayList<TransitionView> trans = dataLayer.getTransitionsArrayList();
+		TransitionView tran = trans.get(transitionId);
+		Iterator to = tran.getConnectToIterator();
+		Iterator from = tran.getConnectFromIterator();
+		if (to.hasNext()) {
+			ArcView arcTo = ((ArcView) to.next());
+			PlaceView source = ((PlaceView) arcTo.getSource());
+			if (dataLayer.isPlaceFunctionalRelated(source.getName())) {
+				LinkedList<MarkingView> weight = arcTo.getWeight();
+				LinkedList<MarkingView> sourceMarking = source
+						.getCurrentMarkingView();
+				for (int i = 0; i < weight.size(); i++) {
+					int current = sourceMarking.get(i).getCurrentMarking();
+					int change=0;
+					for(MarkingView w: weight){
+						if(w.getToken().getID().equals(sourceMarking.get(i).getToken().getID())){
+							change = w.getCurrentMarking();
+						}
+					}
+					//int newMarking = current - weight.get(i).getCurrentMarking();
+					int newMarking = current - change;
+					sourceMarking.get(i).setCurrentMarking(newMarking);
+
+				}
+			}
+
+			// arcTo.updateArcWeight();
+		}
+		if (from.hasNext()) {
+			ArcView arcFrom = ((ArcView) from.next());
+			PlaceView targetPlace = ((PlaceView) arcFrom.getTarget());
+
+			if (dataLayer.isPlaceFunctionalRelated(targetPlace.getName())) {
+				LinkedList<MarkingView> weight = arcFrom.getWeight();
+				LinkedList<MarkingView> sourceMarking = targetPlace
+						.getCurrentMarkingView();
+				for (int i = 0; i < weight.size(); i++) {
+					int current = sourceMarking.get(i).getCurrentMarking();
+					int change=0;
+					for(MarkingView w: weight){
+						if(w.getToken().getID().equals(sourceMarking.get(i).getToken().getID())){
+							change = w.getCurrentMarking();
+						}
+					}
+				//	int newMarking = current + weight.get(i).getCurrentMarking();
+					int newMarking = current - change;
+					sourceMarking.get(i).setCurrentMarking(newMarking);
+				}
+			}
+
+			// arcFrom.updateArcWeight();
+		}
+	}
+	
+	public static void setTokenAfterFiringTransition(int transitionId, PetriNetView pnmlData) {
+
+		PetriNetView dataLayer = pnmlData;
 		ArrayList<TransitionView> trans = dataLayer.getTransitionsArrayList();
 		TransitionView tran = trans.get(transitionId);
 		Iterator to = tran.getConnectToIterator();

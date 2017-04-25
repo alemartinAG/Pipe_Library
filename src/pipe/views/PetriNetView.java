@@ -1429,6 +1429,33 @@ public class PetriNetView extends Observable implements Cloneable, IObserver, Se
             }
         }
     }
+    
+    public void restorePreviousMarking(PetriNetView pnmlData)
+    {
+        if(_markingVectorAnimationStorage != null)
+        {
+            int placeSize = _placeViews.size();
+            for(int placeNo = 0; placeNo < placeSize; placeNo++)
+            {
+                PlaceView placeView = _placeViews.get(placeNo);
+                if(placeView != null)
+                {
+                	try
+                	{
+                		placeView.setCurrentMarking(_markingVectorAnimationStorage[placeNo]);
+                	}
+                	catch(NullPointerException e)
+                	{
+                		placeView.setCurrentMarking(_markingVectorAnimationStorage[placeNo], pnmlData);
+                	}
+                    
+                    setChanged();
+                    notifyObservers(placeView);
+                    setMatrixChanged();
+                }
+            }
+        }
+    }
 
     public void fireTransition(TransitionView transitionView)
     {

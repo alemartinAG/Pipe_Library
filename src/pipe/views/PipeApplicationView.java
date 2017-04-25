@@ -1068,6 +1068,7 @@ public class PipeApplicationView extends JFrame implements ActionListener, Obser
 
     public PetriNetView getCurrentPetriNetView()
     {
+    	System.out.println("We got to this point!!");
         if(_frameForPetriNetTabs == null)
             return null;
         return getPetriNetView(_frameForPetriNetTabs.getSelectedIndex());

@@ -21,6 +21,7 @@ import net.sourceforge.jpowergraph.defaults.DefaultNode;
 import net.sourceforge.jpowergraph.defaults.TextEdge;
 import pipe.calculations.StateSpaceGenerator;
 import pipe.calculations.myTree;
+import pipe.controllers.PipeApplicationController;
 import pipe.exceptions.MarkingNotIntegerException;
 import pipe.exceptions.TimelessTrapException;
 import pipe.exceptions.TreeTooBigException;
@@ -42,11 +43,13 @@ import pipe.io.IncorrectFileFormatException;
 import pipe.io.ReachabilityGraphFileHeader;
 import pipe.io.StateRecord;
 import pipe.io.TransitionRecord;
+import pipe.models.PipeApplicationModel;
 import pipe.modules.interfaces.IModule;
 import pipe.utilities.Expander;
 import pipe.utilities.writers.PNMLWriter;
 import pipe.views.MarkingView;
 import pipe.views.PetriNetView;
+import pipe.views.PipeApplicationView;
 import pipe.views.PlaceView;
 
 /**
@@ -75,8 +78,13 @@ implements IModule
 	private static String dataLayerName;
 
 
-	public void start()
+	public ReachabilityGraphGenerator()
 	{
+		;
+	}
+	
+	public void start()
+	{		
 		PetriNetView pnmlData = ApplicationSettings.getApplicationView().getCurrentPetriNetView();
 		// Check if this net is a CGSPN. If it is, then this
 		// module won't work with it and we must convert it.
@@ -287,7 +295,7 @@ implements IModule
 	}
 
 
-	private void generateGraph(File rgFile, PetriNetView dataLayer,
+	public void generateGraph(File rgFile, PetriNetView dataLayer,
 			boolean coverabilityGraph)
 					throws Exception
 					{
@@ -306,10 +314,10 @@ implements IModule
 		legend += "}";
 		frame.constructGraphFrame(graph, legend);
 		frame.toFront();
-		frame.setIconImage((
+		/*frame.setIconImage((
 				new ImageIcon(Thread.currentThread().getContextClassLoader().
 						getResource(ApplicationSettings.getImagePath() + "icon.png")).getImage()));
-		frame.setTitle(dataLayerName);
+		frame.setTitle(dataLayerName);*/
 					}
 
 
