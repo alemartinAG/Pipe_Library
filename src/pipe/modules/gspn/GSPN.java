@@ -123,7 +123,8 @@ public class GSPN
       
       ArrayList result=new ArrayList();
       // add headers to table
-      result.add(headings[0]);
+      //result.add(headings[0]);
+      result.add("");
       result.add(headings[1]);
       
       DecimalFormat f=new DecimalFormat();

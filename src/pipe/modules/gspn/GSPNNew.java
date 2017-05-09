@@ -128,7 +128,7 @@ public class GSPNNew extends GSPN implements IModule {
 					// This will be used to store the steady state distribution
 					double[] pi;
 
-					String s = "<h2>GSPN Steady State Analysis Results</h2>";
+					String s = "<h3>GSPN Steady State Analysis Results</h3>";
 
 					if (sourceDataLayer == null) {
 						JOptionPane.showMessageDialog(null,
@@ -176,7 +176,7 @@ public class GSPNNew extends GSPN implements IModule {
 
 								// Now format and display the results nicely
 								s += displayResults(sourceDataLayer,
-										reachabilityGraph, pi);
+										reachabilityGraph, pi, output);
 								allfinished = new Date().getTime();
 								explorationtime = (efinished - start) / 1000.0;
 								steadystatetime = (ssdfinished - efinished) / 1000.0;
@@ -273,8 +273,7 @@ public class GSPNNew extends GSPN implements IModule {
 	 *            The steady state distribution
 	 * @return
 	 */
-	private String displayResults(PetriNetView sourceDataLayer, File rgfile,
-			double[] pi) {
+	public String displayResults(PetriNetView sourceDataLayer, File rgfile, double[] pi, File outfile) {
 		StateList tangiblestates; // This will hold all the tangible states
 
 		StringBuilder s = new StringBuilder();
@@ -307,7 +306,7 @@ public class GSPNNew extends GSPN implements IModule {
 
 		try {
 
-			FileWriter outFile = new FileWriter(output);
+			FileWriter outFile = new FileWriter(outfile);
 			PrintWriter out = new PrintWriter(outFile);
 			/*
 			 * FileWriter fw = new FileWriter("someFile.txt"); BufferedWriter bw
@@ -324,7 +323,7 @@ public class GSPNNew extends GSPN implements IModule {
 				out.println(states);
 				s.append("Only a summary of the results will be displayed.");
 				s.append("<br> For complete results see ").append(
-						output.getAbsolutePath());
+						outfile.getAbsolutePath());
 				s.append("<br>");
 			}
 
@@ -382,7 +381,7 @@ public class GSPNNew extends GSPN implements IModule {
 			out.println("</body></html>");
 			out.flush();
 			out.close();
-		} catch (Exception e) {
+		} catch (IOException e) {
 			System.err.println("Error writing to file");
 		}
 
@@ -540,14 +539,14 @@ public class GSPNNew extends GSPN implements IModule {
 	      
 	      ArrayList result = new ArrayList();
 	      // add headers to table
-	      result.add("Marking");
+	      //result.add("Marking");
+	      result.add("");
 	      result.add("Value");
 	      
 	      DecimalFormat f=new DecimalFormat();
 	      f.setMaximumFractionDigits(5);
 	      for (int i = 0; i < rows; i++) {
-	         result.add("<A HREF='#" + list.getID(i) + "'>" +
-	                            list.getID(i).toUpperCase() + "</A>");
+	         result.add(list.getID(i).toUpperCase());
 	         result.add(f.format(data[i]));
 	      }
 	      return ResultsHTMLPane.makeTable(
@@ -962,9 +961,11 @@ public class GSPNNew extends GSPN implements IModule {
 				true, true, true);
 	}
 
-	private double[] getFastTransitionThroughput(PetriNetView pnmldata,
-			StateList list, double[] pi) {
+	private double[] getFastTransitionThroughput(PetriNetView pnmldata, StateList list, double[] pi) 
+	{
 		int length = list.size();
+		
+		PetriNetView original = pnmldata;
 		
 		pnmldata.storeCurrentMarking();
 		TransitionView[] transitionViews = pnmldata.getTransitionViews();
@@ -1001,7 +1002,16 @@ public class GSPNNew extends GSPN implements IModule {
 			}
 		}
 		System.out.println("100.0% done.  ");
-		pnmldata.restorePreviousMarking();
+		
+		try
+		{
+			pnmldata.restorePreviousMarking();
+		} catch (NullPointerException e)
+		{
+			pnmldata.restorePreviousMarking(original);
+		}
+		
+		
 		return result;
 	}
 
@@ -1014,7 +1024,8 @@ public class GSPNNew extends GSPN implements IModule {
 		int transCount = data.length;
 		ArrayList result = new ArrayList();
 		// add headers to table
-		result.add("Transition");
+		//result.add("Transition");
+		result.add("");
 		result.add("Throughput");
 		DecimalFormat f = new DecimalFormat();
 		f.setMaximumFractionDigits(5);
@@ -1071,8 +1082,10 @@ public class GSPNNew extends GSPN implements IModule {
 	 * @param pnmldata
 	 * @param tangibleStates
 	 */
-	private double[] calcSojournTime(PetriNetView pnmldata,
-			StateList tangibleStates) {
+	private double[] calcSojournTime(PetriNetView pnmldata, StateList tangibleStates) 
+	{
+		PetriNetView original = pnmldata;
+		
 		int numStates = tangibleStates.size();
 		int numTrans = pnmldata.getTransitionViews().length;
 		TransitionView[] trans = pnmldata.getTransitionViews();
@@ -1103,7 +1116,14 @@ public class GSPNNew extends GSPN implements IModule {
 			sojournTime[i] = 1 / weights;
 		}
 
-		pnmldata.restorePreviousMarking();
+		try
+		{
+			pnmldata.restorePreviousMarking();
+		} catch (NullPointerException e)
+		{
+			pnmldata.restorePreviousMarking(original);
+		}
+		
 		return sojournTime;
 	}
 }

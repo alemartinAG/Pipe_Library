@@ -1420,8 +1420,7 @@ public class PetriNetView extends Observable implements Cloneable, IObserver, Se
                 PlaceView placeView = _placeViews.get(placeNo);
                 if(placeView != null)
                 {
-                    placeView
-                            .setCurrentMarking(_markingVectorAnimationStorage[placeNo]);
+                    placeView.setCurrentMarking(_markingVectorAnimationStorage[placeNo]);
                     setChanged();
                     notifyObservers(placeView);
                     setMatrixChanged();
