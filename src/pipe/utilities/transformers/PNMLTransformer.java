@@ -6,6 +6,7 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
@@ -13,6 +14,7 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 
 
 /**
@@ -49,11 +51,18 @@ public class PNMLTransformer {
 
       try {
          // Create Transformer with XSL Source File
-         StreamSource xsltSource = new StreamSource(
-                 Thread.currentThread().getContextClassLoader().getResourceAsStream(
-                 "xslt" + System.getProperty("file.separator")
-                 + "GenerateObjectList.xsl"));
-         Transformer transformer = TransformerFactory.newInstance().newTransformer(xsltSource);
+    	  
+    	  /*	// ORIGINAL, doesn't work with petrinator.jar on Windows
+		         StreamSource xsltSource = new StreamSource(
+		                 Thread.currentThread().getContextClassLoader().getResourceAsStream(
+		                 "xslt" + System.getProperty("file.separator")
+		                 + "GenerateObjectList.xsl"));
+		         Transformer transformer = TransformerFactory.newInstance().newTransformer(xsltSource);
+         */
+    	  
+    	  InputStream is = getClass().getResourceAsStream("/xslt/GenerateObjectList.xsl");
+          Source xsltSource = new StreamSource(is);
+          Transformer transformer = TransformerFactory.newInstance().newTransformer(xsltSource);
          
          // TRY TO DO ALL IN MEMORT TO REDUCE READ-WRITE DELAYS
          
